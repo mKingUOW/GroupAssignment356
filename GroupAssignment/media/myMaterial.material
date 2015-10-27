@@ -1,0 +1,160 @@
+material myMaterial/TexturedBoxMaterial
+{
+	technique
+	{
+		pass
+		{
+			diffuse 0.8 0.8 0.8
+			specular 0.6 0.6 0.6
+
+			texture_unit
+			{
+				texture crate.jpg
+			}
+		}
+	}
+}
+
+material myMaterial/NoTexture
+{
+	technique
+	{
+		pass
+		{
+			diffuse 0.2 0.7 1.0
+			specular 0.8 0.2 0.2
+		}
+	}
+}
+
+material myMaterial/NoLighting
+{
+	technique
+	{
+		pass
+		{
+			lighting off
+		}
+	}
+}
+
+material myMaterial/MetalPlate
+{
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				texture MtlPlat2.jpg
+			}
+		}
+	}
+}
+
+material myMaterial/HealthBar
+{
+	receive_shadows off
+
+	technique
+	{
+		pass
+		{
+			lighting off
+
+			texture_unit
+			{
+				texture healthbar.png
+				colour_op replace
+			}
+		}
+	}
+}
+
+material myMaterial/SelectionCircle
+{
+	receive_shadows off
+
+	technique
+	{
+		pass
+		{
+			scene_blend alpha_blend
+			depth_write off
+			lighting off
+
+			texture_unit
+			{
+				texture circulo.png
+				//colour_op alpha_blend
+			}
+		}
+	}
+}
+
+material myMaterial/Rockwall
+
+{
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				texture rockwallExt.tga
+			}
+		}
+	}
+}
+
+material myMaterial/GrassFloor
+
+{
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				texture grass_1024.jpg
+			}
+		}
+	}
+}
+
+material myMaterial/TankMaterial1
+
+{
+	technique
+	{
+		pass
+		{
+			ambient 0.5 0.5 0.5
+			diffuse 0.8 0.8 0.8
+			specular 0.1 0.1 0.1 1.0
+
+			texture_unit
+			{
+				texture lp_tank_skin.bmp
+			}
+		}
+	}
+}
+
+material myMaterial/TankMaterial2
+{
+	technique
+	{
+		pass
+		{
+			ambient 0.5 0.5 0.5
+			diffuse 0.8 0.8 0.8
+			specular 0.2 0.2 0.2 1.0
+
+			texture_unit
+			{
+				texture ch_tank_skin.bmp
+			}
+		}
+	}
+}
