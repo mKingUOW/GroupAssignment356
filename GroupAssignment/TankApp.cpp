@@ -570,6 +570,7 @@ void TankApp::checkClickSelection()
 			{
 				// Get hit location
 				Ogre::Vector3 location = mouseRay.getPoint(itr->distance);
+				location.y = 18;
 				getCurrentSelection()->startMove(location);
 			}
 		}
@@ -623,10 +624,13 @@ void TankApp::addTank(MoveableEntity& tank, int count, int team)
 
 	Ogre::Entity* parts[3];
 	parts[0] = mSceneMgr->createEntity(entBody, "chbody.mesh");
+	parts[0]->setMaterialName("myMaterial/TankMaterial2");
 	parts[0]->setCastShadows(true);
 	parts[1] = mSceneMgr->createEntity(entTurret, "chturret.mesh");
+	parts[1]->setMaterialName("myMaterial/TankMaterial2");
 	parts[1]->setCastShadows(true);
 	parts[2] = mSceneMgr->createEntity(entBarrel, "chbarrel.mesh");
+	parts[2]->setMaterialName("myMaterial/TankMaterial2");
 	parts[2]->setCastShadows(true);
 
 	tank.setupTank(mSceneMgr, randPosMgr, parts, team);

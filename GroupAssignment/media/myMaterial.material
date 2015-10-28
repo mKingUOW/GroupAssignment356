@@ -71,7 +71,7 @@ material myMaterial/HealthBar
 	}
 }
 
-material myMaterial/SelectionCircle
+material myMaterial/SelectionCircleBlue
 {
 	receive_shadows off
 
@@ -85,7 +85,28 @@ material myMaterial/SelectionCircle
 
 			texture_unit
 			{
-				texture circulo.png
+				texture circuloBlue.png
+				//colour_op alpha_blend
+			}
+		}
+	}
+}
+
+material myMaterial/SelectionCircleRed
+{
+	receive_shadows off
+
+	technique
+	{
+		pass
+		{
+			scene_blend alpha_blend
+			depth_write off
+			lighting off
+
+			texture_unit
+			{
+				texture circuloRed.png
 				//colour_op alpha_blend
 			}
 		}

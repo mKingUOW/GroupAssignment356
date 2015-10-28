@@ -87,7 +87,7 @@ void MoveableEntity::setupBillboards(Ogre::SceneManager* mSceneMgr)
 	// Create a BillboardSet to represent a health bar and set its properties
 	mHealthBar = mSceneMgr->createBillboardSet(healthName);
 	mHealthBar->setCastShadows(false);
-	mHealthBar->setDefaultDimensions(15, 1);
+	mHealthBar->setDefaultDimensions(45, 3);
 	mHealthBar->setMaterialName("myMaterial/HealthBar");
 
 	// Create a billboard for the health bar BillboardSet
@@ -99,14 +99,17 @@ void MoveableEntity::setupBillboards(Ogre::SceneManager* mSceneMgr)
 	// Create a BillboardSet for a selection circle and set its properties
 	mSelectionCircle = mSceneMgr->createBillboardSet(circleName);
 	mSelectionCircle->setCastShadows(false);
-	mSelectionCircle->setDefaultDimensions(60, 60);
-	mSelectionCircle->setMaterialName("myMaterial/SelectionCircle");
+	mSelectionCircle->setDefaultDimensions(150, 150);
+	if (team == TankApp::BLUE)
+		mSelectionCircle->setMaterialName("myMaterial/SelectionCircleBlue");
+	else
+		mSelectionCircle->setMaterialName("myMaterial/SelectionCircleRed");
 	mSelectionCircle->setBillboardType(Ogre::BillboardType::BBT_PERPENDICULAR_COMMON);
 	mSelectionCircle->setCommonDirection(Ogre::Vector3(0, 1, 0));
 	mSelectionCircle->setCommonUpVector(Ogre::Vector3(0, 0, -1));
 
 	// Create a billboard for the selection circle BillboardSet
-	mSelectionCircleBB = mSelectionCircle->createBillboard(Ogre::Vector3(0, 1, 0));
+	mSelectionCircleBB = mSelectionCircle->createBillboard(Ogre::Vector3(0, -17, 0));
 	mSelectionCircleBB->setTexcoordRect(0.0, 0.0, 1.0, 1.0);
 }
 
@@ -228,7 +231,7 @@ void MoveableEntity::turnEntity(Ogre::Real time)
 	moveStart();
 	rotationComplete();
 	rotationSoFar = 0;
-	distToDest = destination.distance(tankNode->getPosition()); //sets the distance to the destination
+	distToDest = destination.distance(tankNode->_getDerivedPosition()); //sets the distance to the destination
 	distTravelled = 0;
 }
 
@@ -264,7 +267,7 @@ void MoveableEntity::startMove(Ogre::Vector3 dest)
 
 	destination = dest;
 	//get the angle between entity and destination
-	rotateAngle = tankNode->getPosition().angleBetween(destination);
+	rotateAngle = tankNode->_getDerivedPosition().angleBetween(destination);
 	if (rotateAngle > Ogre::Degree(0))
 		isPositive = true;
 	else
