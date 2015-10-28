@@ -21,6 +21,8 @@ class MoveableEntity
 		void setupBillboards(Ogre::SceneManager* mSceneMgr);
 		void setupTank(Ogre::SceneManager* mSceneMgr, RandomPosition* posMgr, Ogre::Entity** allParts, int team);
 		void attachParts(Ogre::SceneManager* mSceneMgr, Ogre::Entity** allParts);
+		int getTeam();
+
 		void attach();
 		void detach();
 		void attachHealthBar();
@@ -55,9 +57,6 @@ class MoveableEntity
 		Ogre::Real distTravelled;
 
 	private:
-		//constants
-		const float FULL_HEALTH = 1.0f;
-
 		static int numSelected;
 		static int tanksPerTeam;
 		static int totalBBCreated;

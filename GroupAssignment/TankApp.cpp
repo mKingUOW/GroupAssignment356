@@ -18,7 +18,8 @@ MoveableEntity* TankApp::currentSelection = NULL;
 MoveableEntity* TankApp::previousSelection = NULL;
 Graph* TankApp::pathFindingGraph = NULL;
 bool TankApp::pathFindingEnabled = false;
-int TankApp::currentNumTanks = 2;	//default number of starting tanks per team
+int TankApp::currentTanksPerTeam = 2;	//default number of starting tanks per team
+int TankApp::currentNumTanks = 4;		//default number of starting tanks in game
 
 //-------------------------------------------------------------------------------------
 TankApp::TankApp(void)
@@ -92,16 +93,13 @@ void TankApp::createScene(void)
 	cameraNode->attachObject(mCamera);
 
 	//create tank entities
-	int count = 0;
+	int i;
 	MoveableEntity::setStartNumEnts(NUM_STARTING_ENTS);
-	for (int i = 0; i < NUM_STARTING_ENTS; i++, count++)
-		addTank(blueTeam[i], count, BLUE);
+	for (i = 0; i < NUM_STARTING_ENTS; i++)
+		addTank(allTanks[i], i, BLUE);
 
-	for (int i = 0; i < NUM_STARTING_ENTS; i++, count++)
-		addTank(redTeam[i], count, RED);
-	
-	//set the current number of tanks
-	currentTanksPerTeam = NUM_STARTING_ENTS;
+	for (i; i < NUM_STARTING_ENTS*2; i++)
+		addTank(allTanks[i], i, RED);
 
 	// Set background colour to dark grey so that you can see the health bar
 	mWindow->getViewport(0)->setBackgroundColour(Ogre::ColourValue(0.2f, 0.2f, 0.2f));
@@ -385,14 +383,8 @@ void TankApp::enablePFNetwork()
 
 void TankApp::updatePositions(Ogre::Real time)
 {
-	for (int i = 0; i < currentTanksPerTeam; i++)
-	{
-		redTeam[i].update(time);
-	}
-	for (int i = 0; i < currentTanksPerTeam; i++)
-	{
-		blueTeam[i].update(time);
-	}
+	for (int i = 0; i < currentNumTanks; i++)
+		allTanks[i].update(time);
 }
 
 void TankApp::updateSelectionBox()
@@ -519,21 +511,16 @@ void TankApp::checkBoxSelection()
 	detachAll();
 
 	Ogre::SceneQueryResultMovableList::iterator it;
+	//increments the character value of i each iteration so we can use a character to search the entity name
 	for (it = result.movables.begin(); it != result.movables.end(); ++it)
 	{
 		Ogre::String name = (*it)->getName();
 
-		// Check name with selectable entity names and add selected robot. Detach all others if L_CRTL is not being held
-		if(name == "Robot1")
-			robot[0].toggleSelection();
-
-		else if(name == "Robot2")
-			robot[1].toggleSelection();
-
-		else if(name == "Robot3")
-			robot[2].toggleSelection();
-
-		else;
+		int index = getIndexFromString(name);
+		
+		//make sure index is within correct range, more thatn 0 and less than the current number of tanks in the game
+		if(index >= 0 && index < currentNumTanks)
+			allTanks[index].toggleSelection();
 	}
 	mSceneMgr->destroyQuery(volumeQuery);
 	//need to detach the manual object to avoid inability to select entities underneath it
@@ -566,27 +553,14 @@ void TankApp::checkClickSelection()
 		// Get name of movable object that was hit
 		name = itr->movable->getName();
 		
-		// Check name with selectable entity names and add selected robot. Detach all others if L_CRTL is not being held
-		if (name == "Robot1")
+		int index = getIndexFromString(name);
+		
+		//make sure index is within correct range, more thatn 0 and less than the current number of tanks in the game
+		if(index >= 0 && index < currentNumTanks)
 		{
-			if (!alterSelection && !robot[0].isSelected())
+			if (!alterSelection && !allTanks[index].isSelected())
 				detachAll();
-			robot[0].toggleSelection();
-			inside = true;
-		}
-		else if (name == "Robot2")
-		{
-			if (!alterSelection && !robot[1].isSelected())
-				detachAll();
-			robot[1].toggleSelection();
-			inside = true;
-		}
-		else if (name == "Robot3")
-		{
-			if (!alterSelection && !robot[2].isSelected())
-				detachAll();
-			robot[2].toggleSelection();
-			inside = true;
+			allTanks[index].toggleSelection();
 		}
 		//can freely move around the map unless path finding is enabled
 		else if (name == "GroundEntity" && !pathFindingEnabled)
@@ -615,13 +589,24 @@ Ogre::Plane TankApp::createPlane(const Ogre::Vector3 &v1, const Ogre::Vector3 &v
 //detaches all previously selected entities health bars and selection circles
 void TankApp::detachAll()
 {
-	int i = 0;
-	while (i < NUM_ENTITIES)
+	for (int i = 0; i < currentNumTanks; i++)
 	{
-		if (robot[i].isSelected())
-			robot[i].detach();
-		i++;
+		if (allTanks[i].isSelected())
+			allTanks[i].detach();
 	}
+}
+
+//character digit minus character baseChar will give us the correct index for an entity
+//ASCII value of '0' is 30 therefore, 30 - 30 = 0, ASCII value of '1' is 31 therefore 31 - 30 = 1 etc
+//THIS METHOD SHOULD ONLY BE USED FOR VALUES INCLUDING 0-9 (10 VALUES) 
+int TankApp::getIndexFromString(const std::string& name)
+{
+	char baseChar = '0';
+
+	//get the last character of the entities name
+	char digit = name[name.length()-1];
+
+	return digit - baseChar;
 }
 
 
@@ -641,7 +626,7 @@ void TankApp::addTank(MoveableEntity& tank, int count, int team)
 	parts[0]->setCastShadows(true);
 	parts[1] = mSceneMgr->createEntity(entTurret, "chturret.mesh");
 	parts[1]->setCastShadows(true);
-	parts[2] = mSceneMgr->createEntity(entTurret, "chbarrel.mesh");
+	parts[2] = mSceneMgr->createEntity(entBarrel, "chbarrel.mesh");
 	parts[2]->setCastShadows(true);
 
 	tank.setupTank(mSceneMgr, randPosMgr, parts, team);
@@ -679,93 +664,100 @@ void TankApp::createWall(std::string &name, Ogre::Vector3 position, Ogre::Real s
 	return;
 }
 
+//add one additional tank to each team
+void TankApp::addAdditionalTanks()
+{
+
+}
+
+
 void TankApp::checkState()
 {
-	// if path already exists
-	if (mCurrentState > 1)
-	{
-		// reset
-		mCurrentState = 0;
-		path->clear();
-	}
-	// if no path yet
-	else
-	{
-		// Create RaySceneQuery
-		Ogre::Ray mouseRay = mCamera->getCameraToViewportRay(
-			static_cast<float>(mMouse->getMouseState().X.abs)/mMouse->getMouseState().width, 
-			static_cast<float>(mMouse->getMouseState().Y.abs)/mMouse->getMouseState().height);
+	//// if path already exists
+	//if (mCurrentState > 1)
+	//{
+	//	// reset
+	//	mCurrentState = 0;
+	//	path->clear();
+	//}
+	//// if no path yet
+	//else
+	//{
+	//	// Create RaySceneQuery
+	//	Ogre::Ray mouseRay = mCamera->getCameraToViewportRay(
+	//		static_cast<float>(mMouse->getMouseState().X.abs)/mMouse->getMouseState().width, 
+	//		static_cast<float>(mMouse->getMouseState().Y.abs)/mMouse->getMouseState().height);
 
-		Ogre::RaySceneQuery * mRaySceneQuery = mSceneMgr->createRayQuery(Ogre::Ray());
+	//	Ogre::RaySceneQuery * mRaySceneQuery = mSceneMgr->createRayQuery(Ogre::Ray());
 
-		// Set ray
-		mRaySceneQuery->setRay(mouseRay);
+	//	// Set ray
+	//	mRaySceneQuery->setRay(mouseRay);
 
-		// Ray-cast and get first hit
-		Ogre::RaySceneQueryResult &result = mRaySceneQuery->execute();
-		Ogre::RaySceneQueryResult::iterator itr = result.begin();
+	//	// Ray-cast and get first hit
+	//	Ogre::RaySceneQueryResult &result = mRaySceneQuery->execute();
+	//	Ogre::RaySceneQueryResult::iterator itr = result.begin();
 
-		// if hit an object
-		if (itr != result.end())
-		{
-			// Get hit location
-			Ogre::Vector3 location = mouseRay.getPoint(itr->distance);
+	//	// if hit an object
+	//	if (itr != result.end())
+	//	{
+	//		// Get hit location
+	//		Ogre::Vector3 location = mouseRay.getPoint(itr->distance);
 
-			// if hit the floor
-			if (location.y < 0.001)
-			{
-				// if no start node yet
-				if (mCurrentState == 0)
-				{
-					// set start node
-					startNode = pathFindingGraph->getNode(location);
-					// set state to goal node state
-					mCurrentState++;
-				}
-				// if start node already assigned
-				else if (mCurrentState == 1)
-				{
-					// set goal node
-					goalNode = pathFindingGraph->getNode(location);
+	//		// if hit the floor
+	//		if (location.y < 0.001)
+	//		{
+	//			// if no start node yet
+	//			if (mCurrentState == 0)
+	//			{
+	//				// set start node
+	//				startNode = pathFindingGraph->getNode(location);
+	//				// set state to goal node state
+	//				mCurrentState++;
+	//			}
+	//			// if start node already assigned
+	//			else if (mCurrentState == 1)
+	//			{
+	//				// set goal node
+	//				goalNode = pathFindingGraph->getNode(location);
 
-					if (MoveableEntity::getNumSelected() == 1)
-					{
-						startNode = pathFindingGraph->getNode(robot[0].getSceneNode()->getPosition());
-						path->clear();
-					}
+	//				if (MoveableEntity::getNumSelected() == 1)
+	//				{
+	//					startNode = pathFindingGraph->getNode(robot[0].getSceneNode()->getPosition());
+	//					path->clear();
+	//				}
 
-					// check that goal node is not the same as start node
-					if (goalNode != startNode)
-					{
-						// try to find path from start to goal node
-						std::vector<int> mainPath;
+	//				// check that goal node is not the same as start node
+	//				if (goalNode != startNode)
+	//				{
+	//					// try to find path from start to goal node
+	//					std::vector<int> mainPath;
 
-						// if path exists
-						if (mPathFinder.AStar(startNode, goalNode, *pathFindingGraph, mainPath))
-						{
-							// draw path
-							createPath(path, 0.5, mainPath, Ogre::ColourValue(1, 0, 0));
+	//					// if path exists
+	//					if (mPathFinder.AStar(startNode, goalNode, *pathFindingGraph, mainPath))
+	//					{
+	//						// draw path
+	//						createPath(path, 0.5, mainPath, Ogre::ColourValue(1, 0, 0));
 
-							//if an entity is selected we should set the path for it to follow
-							if (MoveableEntity::getNumSelected() == 1)
-							{
-								robot[0].setPath(mainPath);
-								robot[0].startMove(pathFindingGraph->getPosition(mainPath[1]));//********************************************************
-							}
+	//						//if an entity is selected we should set the path for it to follow
+	//						if (MoveableEntity::getNumSelected() == 1)
+	//						{
+	//							robot[0].setPath(mainPath);
+	//							robot[0].startMove(pathFindingGraph->getPosition(mainPath[1]));//********************************************************
+	//						}
 
-							// set state to path found
-							mCurrentState++;
-						}
-						else
-						{
-							// no path so set state to no start node
-							mCurrentState = 0;
-						}
-					}
-				}
-			}
-		}
-	}
+	//						// set state to path found
+	//						mCurrentState++;
+	//					}
+	//					else
+	//					{
+	//						// no path so set state to no start node
+	//						mCurrentState = 0;
+	//					}
+	//				}
+	//			}
+	//		}
+	//	}
+	//}
 }
 
 void TankApp::toggleGrid()

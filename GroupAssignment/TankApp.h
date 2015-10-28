@@ -19,6 +19,7 @@ as a result may contain some original code from the Ogre tutorial.
 
 #include <fstream>
 #include <string>
+#include <cstdlib>
 
 class TankApp : public BaseApplication
 {
@@ -68,11 +69,15 @@ private:
 	void checkClickSelection();
 	Ogre::Plane createPlane(const Ogre::Vector3 &v1, const Ogre::Vector3 &v2, const Ogre::Vector3 &v3);
 	void detachAll();
+	int getIndexFromString(const std::string& name);
 
 	//scene creation
 	void addTank(MoveableEntity& tank, int count, int team);
 	void createBoundaryWalls();
 	void createWall(std::string &name, Ogre::Vector3 postition, Ogre::Real scaleFactor, Ogre::Real scaleFactorZ);
+
+	//adds one additional tank to each team
+	void addAdditionalTanks();
 
 	//path finding
 	void checkState();
@@ -100,8 +105,7 @@ private:
 
 	//variables
 	Ogre::Entity* tankEnt[MAX_ENTITIES];
-	MoveableEntity blueTeam[MAX_NUM_TEAM_ENTITIES];
-	MoveableEntity redTeam[MAX_NUM_TEAM_ENTITIES];
+	MoveableEntity allTanks[MAX_ENTITIES];
 	int mSelectedRobots[MAX_NUM_TEAM_ENTITIES];
 
 	float mMove;

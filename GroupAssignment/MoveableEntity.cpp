@@ -7,6 +7,8 @@ int MoveableEntity::numSelected = 0;
 int MoveableEntity::tanksPerTeam = 0;
 int MoveableEntity::totalBBCreated = 0;
 
+const float FULL_HEALTH = 1.0f;
+
 //--------------------------------------------------------MOVEABLE ENTITY---------------------------------------------------//
 MoveableEntity::MoveableEntity()
 {
@@ -140,6 +142,11 @@ void MoveableEntity::attachParts(Ogre::SceneManager* mSceneMgr, Ogre::Entity** a
 
 	barrelNode->attachObject(parts[2]);
 	barrelNode->translate(-30, 10, 0);
+}
+
+int MoveableEntity::getTeam()
+{
+	return team;
 }
 
 void MoveableEntity::attach()
