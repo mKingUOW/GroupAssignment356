@@ -15,6 +15,7 @@ as a result may contain some original code from the Ogre tutorial.
  
 #include "stdafx.h"
 #include "BaseApplication.h"
+#include "RandomPosition.h"
 #include "PathFinding.h"
 
 #include <fstream>
@@ -35,7 +36,7 @@ public:
 	static bool isPFEnabled();
 	static Graph* getGraphRef();
 
-	RandomPosition *getPosMgr();
+	RandomPosition* getPosMgr();
 
 	//path finding related
 	void enablePFNetwork();
@@ -92,18 +93,19 @@ private:
 	static bool pathFindingEnabled;
 	PathFinding mPathFinder;
 
-	RandomPosition *randPosMgr;		//used for managing random position generation
-
 	Ogre::ManualObject* grid[GRID_SEGMENTS];
 	bool isGridVisible;
 
 	//static variables
-	static MoveableEntity *currentSelection;
-	static MoveableEntity *previousSelection;
+	static MoveableEntity* currentSelection;
+	static MoveableEntity* previousSelection;
 	static int currentNumTanks;
 	static int currentTanksPerTeam;
+	
+	RandomPosition* randPosMgr;		//used for managing random position generation
 
 	//variables
+	bool isStartOfGame;
 	Ogre::Entity* tankEnt[MAX_ENTITIES];
 	MoveableEntity allTanks[MAX_ENTITIES];
 	int mSelectedRobots[MAX_NUM_TEAM_ENTITIES];

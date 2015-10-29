@@ -25,6 +25,7 @@ int TankApp::currentNumTanks = 4;		//default number of starting tanks in game
 TankApp::TankApp(void)
 {
 	isGridVisible = false;
+	isStartOfGame = true;
 	mCurrentState = 0;
 	randPosMgr = new RandomPosition;
 }
@@ -115,6 +116,13 @@ bool TankApp::frameRenderingQueued(const Ogre::FrameEvent& evt)
  
 	if(mShutDown)
 		return false;
+
+	if(isStartOfGame)
+	{
+		for (int i = 0; i < currentNumTanks; i++)
+			allTanks[i].travelToBattleground();
+		isStartOfGame = false;
+	}
  
 	//Need to capture/update each device
 	mKeyboard->capture();
@@ -623,19 +631,32 @@ void TankApp::addTank(MoveableEntity& tank, int count, int team)
 	std::string entBarrel = "barrel" + oss.str();
 
 	Ogre::Entity* parts[3];
-	parts[0] = mSceneMgr->createEntity(entBody, "chbody.mesh");
-	parts[0]->setMaterialName("myMaterial/TankMaterial2");
-	parts[0]->setCastShadows(true);
-	parts[1] = mSceneMgr->createEntity(entTurret, "chturret.mesh");
-	parts[1]->setMaterialName("myMaterial/TankMaterial2");
-	parts[1]->setCastShadows(true);
-	parts[2] = mSceneMgr->createEntity(entBarrel, "chbarrel.mesh");
-	parts[2]->setMaterialName("myMaterial/TankMaterial2");
-	parts[2]->setCastShadows(true);
+	if (team == RED)
+	{
+		parts[0] = mSceneMgr->createEntity(entBody, "lpbody.mesh");
+		parts[0]->setMaterialName("myMaterial/TankMaterial1");
+		parts[0]->setCastShadows(true);
+		parts[1] = mSceneMgr->createEntity(entTurret, "lpturret.mesh");
+		parts[1]->setMaterialName("myMaterial/TankMaterial1");
+		parts[1]->setCastShadows(true);
+		parts[2] = mSceneMgr->createEntity(entBarrel, "lpbarrel.mesh");
+		parts[2]->setMaterialName("myMaterial/TankMaterial1");
+		parts[2]->setCastShadows(true);
+	}
+	else
+	{
+		parts[0] = mSceneMgr->createEntity(entBody, "chbody.mesh");
+		parts[0]->setMaterialName("myMaterial/TankMaterial2");
+		parts[0]->setCastShadows(true);
+		parts[1] = mSceneMgr->createEntity(entTurret, "chturret.mesh");
+		parts[1]->setMaterialName("myMaterial/TankMaterial2");
+		parts[1]->setCastShadows(true);
+		parts[2] = mSceneMgr->createEntity(entBarrel, "chbarrel.mesh");
+		parts[2]->setMaterialName("myMaterial/TankMaterial2");
+		parts[2]->setCastShadows(true);
+	}
 
 	tank.setupTank(mSceneMgr, randPosMgr, parts, team);
-
-	return;
 }
 
 void TankApp::createBoundaryWalls()

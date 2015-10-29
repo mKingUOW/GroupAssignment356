@@ -19,7 +19,7 @@ class MoveableEntity
 		void setHealthName(const Ogre::String num);
 		void setCircleName(const Ogre::String num);
 		void setupBillboards(Ogre::SceneManager* mSceneMgr);
-		void setupTank(Ogre::SceneManager* mSceneMgr, RandomPosition* posMgr, Ogre::Entity** allParts, int team);
+		void setupTank(Ogre::SceneManager* mSceneMgr, RandomPosition* thePosMgr, Ogre::Entity** allParts, int team);
 		void attachParts(Ogre::SceneManager* mSceneMgr, Ogre::Entity** allParts);
 		int getTeam();
 
@@ -31,6 +31,13 @@ class MoveableEntity
 		void detachCircle();
 		void adjustHealth();
 
+		//state methods
+		void travelToBattleground();
+		void searchForTarget(Ogre::Real time);
+		void chaseTarget(Ogre::Real time);
+		bool checkForEnemy();
+
+		//movement methods
 		void turnEntity(Ogre::Real time);
 		void moveEntity(Ogre::Real time);
 		void chaseEntity(Ogre::Real time);
@@ -65,12 +72,14 @@ class MoveableEntity
 		Ogre::SceneNode* tankNode;
 		Ogre::SceneNode* turretNode;
 		Ogre::SceneNode* barrelNode;
+		RandomPosition* posMgr;
 
 		Ogre::Entity* parts[3];
 		float tankHealth;
 		bool selected;
 		Ogre::Vector3 destination;
 		Ogre::SceneNode *nodeToChase;
+		Ogre::Real timeSinceLastCheck;
 
 		Ogre::BillboardSet* mHealthBar;
 		Ogre::Billboard* mHealthBarBB;
@@ -90,6 +99,10 @@ class MoveableEntity
 		std::vector<int> path;
 		int nextNode;
 		int lastNode;
+
+		//states
+		bool isSearchingForTarget;
+		bool isChasingTarget;
 		bool isRotating;
 		bool isMoving;
 		bool isChasing;

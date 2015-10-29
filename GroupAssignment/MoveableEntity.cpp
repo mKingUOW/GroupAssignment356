@@ -8,6 +8,8 @@ int MoveableEntity::tanksPerTeam = 0;
 int MoveableEntity::totalBBCreated = 0;
 
 const float FULL_HEALTH = 1.0f;
+const enum spawnAreas {red, battle, blue};
+const int CHECK_INTERVAL = 1;
 
 //--------------------------------------------------------MOVEABLE ENTITY---------------------------------------------------//
 MoveableEntity::MoveableEntity()
@@ -21,12 +23,15 @@ MoveableEntity::MoveableEntity()
 	mChase = 40;
 	mRotate = 250;
 	rotationSoFar = 0;
+	isSearchingForTarget = false;
+	isChasingTarget = false;
 	isRotating = false;
 	isMoving = false;
 	isChasing = false;
 	nodeToChase = NULL;
 	moveVector = Ogre::Vector3(80, 0, 0);
 	chaseVector = Ogre::Vector3(40, 0, 0);
+	timeSinceLastCheck = 0;
 }
 
 //sets the scenenode for the entity
@@ -113,8 +118,10 @@ void MoveableEntity::setupBillboards(Ogre::SceneManager* mSceneMgr)
 	mSelectionCircleBB->setTexcoordRect(0.0, 0.0, 1.0, 1.0);
 }
 
-void MoveableEntity::setupTank(Ogre::SceneManager* mSceneMgr, RandomPosition* posMgr, Ogre::Entity** allParts, int aTeam)
+void MoveableEntity::setupTank(Ogre::SceneManager* mSceneMgr, RandomPosition* thePosMgr, Ogre::Entity** allParts, int aTeam)
 {
+	posMgr = thePosMgr;
+
 	team = aTeam;
 	attachParts(mSceneMgr, allParts);
 	setHealth(FULL_HEALTH);
@@ -151,6 +158,12 @@ int MoveableEntity::getTeam()
 {
 	return team;
 }
+
+//-------------------------------------STATIC METHODS-------------------------------------//
+//
+
+
+//----------------------------------------------------------------------------------------//
 
 void MoveableEntity::attach()
 {
@@ -200,6 +213,42 @@ void MoveableEntity::adjustHealth()
 	float healthBarAdjuster = (1.0 - tankHealth)/2;	// This must range from 0.0 to 0.5
 	// Set the health bar to the appropriate level
 	mHealthBarBB->setTexcoordRect(0.0 + healthBarAdjuster, 0.0, 0.5 + healthBarAdjuster, 1.0);
+}
+
+void MoveableEntity::travelToBattleground()
+{
+	//sets the destination of the tank to a random location on the battleground
+	startMove(posMgr->getRandPosition(battle));
+	isSearchingForTarget = true;
+}
+
+//searches the grid radius around the tanks current position for a target
+//search happens once per second
+void MoveableEntity::searchForTarget(Ogre::Real time)
+{
+	//move the entity
+	moveEntity(time);
+
+	timeSinceLastCheck += time;
+	if (timeSinceLastCheck > CHECK_INTERVAL)
+	{
+		if (checkForEnemy())	//this method sets nodeToChase
+		{
+			isSearchingForTarget = false;
+			isChasingTarget = true;
+		}
+		timeSinceLastCheck = 0;
+	}
+}
+
+void MoveableEntity::chaseTarget(Ogre::Real time)
+{
+	
+}
+
+bool MoveableEntity::checkForEnemy()
+{
+	return false;
 }
 
 //turns the entity a fraction of the total angle to ensure a smooth rotation
@@ -257,7 +306,7 @@ void MoveableEntity::moveEntity(Ogre::Real time)
 //method used to chase another agent
 void MoveableEntity::chaseEntity(Ogre::Real time)
 {
-	tankNode->lookAt(nodeToChase->getPosition(), Ogre::Node::TS_WORLD, Ogre::Vector3::UNIT_X);
+	tankNode->lookAt(nodeToChase->_getDerivedPosition(), Ogre::Node::TS_WORLD, Ogre::Vector3::UNIT_X);
 	tankNode->translate(time * chaseVector, Ogre::Node::TS_LOCAL);
 }
 
@@ -280,9 +329,9 @@ void MoveableEntity::update(Ogre::Real time)
 		turnEntity(time);
 	else if (isChasing)
 		chaseEntity(time);
-	else if (isMoving)
-		moveEntity(time);
-	else {} //do nothing
+	else if (isSearchingForTarget)
+		searchForTarget(time);
+	else {}
 }
 
 void MoveableEntity::rotationStart()
