@@ -42,12 +42,14 @@ public:
 	void enablePFNetwork();
 
 	//constants
-	static const int GRID_SEGMENTS = 28;
+	static const int X_SEGMENTS = 15;
+	static const int Z_SEGMENTS = 15;
 	static const int NUM_TEAMS = 2;
 	static const int NUM_STARTING_ENTS = 2;
 	static const int MAX_NUM_TEAM_ENTITIES = 4;	//max per team
 	static const int MAX_ENTITIES = 8;
-	static const int HALF_MAP_SIZE = 750;
+	static const int HALF_X_SIZE = 1600;
+	static const int HALF_Z_SIZE = 1600;
 	static const int RED = 0;
 	static const int BLUE = 2;
  
@@ -93,7 +95,7 @@ private:
 	static bool pathFindingEnabled;
 	PathFinding mPathFinder;
 
-	Ogre::ManualObject* grid[GRID_SEGMENTS];
+	Ogre::ManualObject* grid[X_SEGMENTS+Z_SEGMENTS];
 	bool isGridVisible;
 
 	//static variables

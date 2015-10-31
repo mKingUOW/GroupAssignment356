@@ -310,6 +310,8 @@ void MoveableEntity::chaseEntity(Ogre::Real time)
 	tankNode->translate(time * chaseVector, Ogre::Node::TS_LOCAL);
 }
 
+
+//initiates moving an entity to a location using a destination vector
 void MoveableEntity::startMove(Ogre::Vector3 dest)
 {
 	rotationStart();

@@ -79,7 +79,7 @@ void TankApp::createScene(void)
 	// Use a plane to represent the ground
 	Ogre::Plane plane(Ogre::Vector3::UNIT_Y, 0);
     Ogre::MeshManager::getSingleton().createPlane("ground", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-        plane, 3400, 1600, 20, 20, true, 1, 5, 5, Ogre::Vector3::UNIT_Z);
+        plane, 6800, 3200, 20, 20, true, 1, 5, 5, Ogre::Vector3::UNIT_Z);
 
 	Ogre::Entity* entGround = mSceneMgr->createEntity("GroundEntity", "ground");
 	entGround->setMaterialName("myMaterial/GrassFloor");
@@ -662,13 +662,13 @@ void TankApp::addTank(MoveableEntity& tank, int count, int team)
 void TankApp::createBoundaryWalls()
 {
 	std::string entityName = "northWall";
-	createWall(entityName, Ogre::Vector3(0,25,-812.5), 34.5f, 0.25f);
+	createWall(entityName, Ogre::Vector3(0,25,-1612.5), 68.5f, 0.25f);
 	entityName = "westWall";
-	createWall(entityName, Ogre::Vector3(-1712.5,25,0), 0.25f, 16.0f);
+	createWall(entityName, Ogre::Vector3(-3412.5,25,0), 0.25f, 32.0f);
 	entityName = "southWall";
-	createWall(entityName, Ogre::Vector3(0,25,812.5), 34.5f, 0.25f);
+	createWall(entityName, Ogre::Vector3(0,25,1612.5), 68.5f, 0.25f);
 	entityName = "eastWall";
-	createWall(entityName, Ogre::Vector3(1712.5,25,0), 0.25f, 16.0f);
+	createWall(entityName, Ogre::Vector3(3412.5,25,0), 0.25f, 32.0f);
 	
 }
 
@@ -787,21 +787,20 @@ void TankApp::checkState()
 
 void TankApp::toggleGrid()
 {
-	for (int i = 0; i < GRID_SEGMENTS; i++)
+	for (int i = 0; i < X_SEGMENTS+Z_SEGMENTS; i++)
 		grid[i]->setVisible(!isGridVisible);
 	isGridVisible = !isGridVisible;
 }
 
 void TankApp::createGrid()
 {
-	Ogre::Real startX = HALF_MAP_SIZE - SQUARE_SIZE;	//POSITIVE X
-	Ogre::Real startZ = -HALF_MAP_SIZE;					//NEGATIVE Z
+	Ogre::Real startX = HALF_X_SIZE - SQUARE_SIZE;	//POSITIVE X
+	Ogre::Real startZ = -HALF_Z_SIZE;					//NEGATIVE Z
 	Ogre::Real endX = startX;							//POSITIVE X
-	Ogre::Real endZ = HALF_MAP_SIZE;					//POSITIVE Z
-	int cols = GRID_SEGMENTS / 2;
+	Ogre::Real endZ = HALF_Z_SIZE;					//POSITIVE Z
 
 	//draw column lines
-	for (int i = 0; i < cols; i++)
+	for (int i = 0; i < X_SEGMENTS; i++)
 	{
 		// Create unique name
 		std::ostringstream oss;
@@ -820,30 +819,31 @@ void TankApp::createGrid()
 		endX = startX;
 		mSceneMgr->getRootSceneNode()->attachObject(grid[i]);
 	}
-	startX = -HALF_MAP_SIZE;
-	startZ = -HALF_MAP_SIZE + SQUARE_SIZE;
-	endX = HALF_MAP_SIZE;
+	startX = -HALF_X_SIZE;
+	startZ = -HALF_Z_SIZE + SQUARE_SIZE;
+	endX = HALF_X_SIZE;
 	endZ = startZ;
 
 	//draw row lines
-	for (int i = cols; i < GRID_SEGMENTS; i++)
+	for (int i = 0; i < Z_SEGMENTS; i++)
 	{
 		// Create unique name
 		std::ostringstream oss;
-		oss << i;
+		int j = i + X_SEGMENTS;
+		oss << j;
 		std::string lineName = "line" + oss.str();
-		grid[i] = mSceneMgr->createManualObject(lineName);
+		grid[j] = mSceneMgr->createManualObject(lineName);
 
-		grid[i]->begin("BaseWhiteNoLighting", Ogre::RenderOperation::OT_LINE_STRIP);
-		grid[i]->position(Ogre::Vector3(startX, 1, startZ));
-		grid[i]->position(Ogre::Vector3(endX, 1, endZ));
-		grid[i]->colour(1, 1, 1);
-		grid[i]->end();
-		grid[i]->setVisible(false);
+		grid[j]->begin("BaseWhiteNoLighting", Ogre::RenderOperation::OT_LINE_STRIP);
+		grid[j]->position(Ogre::Vector3(startX, 1, startZ));
+		grid[j]->position(Ogre::Vector3(endX, 1, endZ));
+		grid[j]->colour(1, 1, 1);
+		grid[j]->end();
+		grid[j]->setVisible(false);
 
 		startZ += SQUARE_SIZE;
 		endZ = startZ;
-		mSceneMgr->getRootSceneNode()->attachObject(grid[i]);
+		mSceneMgr->getRootSceneNode()->attachObject(grid[j]);
 	}
 }
 

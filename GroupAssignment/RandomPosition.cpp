@@ -6,20 +6,20 @@ RandomPosition::RandomPosition()
 	srand(time(0));
 	tankOnGround = 18;
 	int i = 0;
-	minMaxXZ[red][minX] = -1650;
-	minMaxXZ[red][maxX] = -1250;
-	minMaxXZ[red][minZ] = -750;
-	minMaxXZ[red][maxZ] = 750;
+	minMaxXZ[red][minX] = -3300;
+	minMaxXZ[red][maxX] = -2500;
+	minMaxXZ[red][minZ] = -1500;
+	minMaxXZ[red][maxZ] = 1500;
 
-	minMaxXZ[battle][minX] = -350;
-	minMaxXZ[battle][maxX] = 350;
-	minMaxXZ[battle][minZ] = -750;
-	minMaxXZ[battle][maxZ] = 750;
+	minMaxXZ[battle][minX] = -1500;
+	minMaxXZ[battle][maxX] = 1500;
+	minMaxXZ[battle][minZ] = -1500;
+	minMaxXZ[battle][maxZ] = 1500;
 
-	minMaxXZ[blue][minX] = 1250;
-	minMaxXZ[blue][maxX] = 1650;
-	minMaxXZ[blue][minZ] = -750;
-	minMaxXZ[blue][maxZ] = 750;
+	minMaxXZ[blue][minX] = 2500;
+	minMaxXZ[blue][maxX] = 3300;
+	minMaxXZ[blue][minZ] = -1500;
+	minMaxXZ[blue][maxZ] = 1500;
 }
 
 Ogre::Vector3 RandomPosition::getRandPosition(int area)
