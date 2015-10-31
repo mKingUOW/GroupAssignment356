@@ -276,7 +276,7 @@ void MoveableEntity::turnEntity(Ogre::Real time)
 		}
 	}
 	//when total angle reached
-	tankNode->lookAt(destination, Ogre::Node::TS_WORLD, Ogre::Vector3::UNIT_X);
+	tankNode->lookAt(destination, Ogre::Node::TS_WORLD, Ogre::Vector3::NEGATIVE_UNIT_X);
 	moveStart();
 	rotationComplete();
 	rotationSoFar = 0;
@@ -291,7 +291,7 @@ void MoveableEntity::moveEntity(Ogre::Real time)
 	//checks if the distance travelled is less than the total distance from the initial position to the destination
 	if (distTravelled < distToDest)
 	{
-		tankNode->translate(time * moveVector, Ogre::Node::TS_LOCAL);
+		tankNode->translate(time * -moveVector, Ogre::Node::TS_LOCAL);
 		distTravelled += time * mMove;
 	}
 	else //sets the final position of the scene node and completes the move
