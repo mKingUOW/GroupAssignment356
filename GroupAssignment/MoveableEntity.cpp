@@ -19,7 +19,7 @@ MoveableEntity::MoveableEntity()
 	tankNode = NULL;
 	healthName = "health";
 	circleName = "circle";
-	mMove = 80;
+	mMove = 120;
 	mChase = 40;
 	mRotate = 250;
 	rotationSoFar = 0;
@@ -222,35 +222,6 @@ void MoveableEntity::travelToBattleground()
 	isSearchingForTarget = true;
 }
 
-//searches the grid radius around the tanks current position for a target
-//search happens once per second
-void MoveableEntity::searchForTarget(Ogre::Real time)
-{
-	//move the entity
-	moveEntity(time);
-
-	timeSinceLastCheck += time;
-	if (timeSinceLastCheck > CHECK_INTERVAL)
-	{
-		if (checkForEnemy())	//this method sets nodeToChase
-		{
-			isSearchingForTarget = false;
-			isChasingTarget = true;
-		}
-		timeSinceLastCheck = 0;
-	}
-}
-
-void MoveableEntity::chaseTarget(Ogre::Real time)
-{
-	
-}
-
-bool MoveableEntity::checkForEnemy()
-{
-	return false;
-}
-
 //turns the entity a fraction of the total angle to ensure a smooth rotation
 //this will continue to be called until the totalAngle is reached
 void MoveableEntity::turnEntity(Ogre::Real time)
@@ -323,17 +294,6 @@ void MoveableEntity::startMove(Ogre::Vector3 dest)
 		isPositive = true;
 	else
 		isPositive = false;
-}
-
-void MoveableEntity::update(Ogre::Real time)
-{
-	if (isRotating)
-		turnEntity(time);
-	else if (isChasing)
-		chaseEntity(time);
-	else if (isSearchingForTarget)
-		searchForTarget(time);
-	else {}
 }
 
 void MoveableEntity::rotationStart()
