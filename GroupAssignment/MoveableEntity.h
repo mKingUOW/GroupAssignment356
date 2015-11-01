@@ -42,7 +42,6 @@ class MoveableEntity
 		void moveEntity(Ogre::Real time);
 		void chaseEntity(Ogre::Real time);
 		void startMove(Ogre::Vector3 dest);
-		void update(Ogre::Real time);
 		void rotationComplete();
 		void rotationStart();
 		void moveStart();
@@ -63,13 +62,28 @@ class MoveableEntity
 		Ogre::Real distToDest;
 		Ogre::Real distTravelled;
 
+		// moved from private to be used in TankApp functions
+		// {
+				Ogre::SceneNode* tankNode;
+
+				int team;		//0 is red, 2 is blue
+				Ogre::Real timeSinceLastCheck;
+
+				//states
+				bool isSearchingForTarget;
+				bool isChasingTarget;
+				bool isRotating;
+				bool isMoving;
+				bool isChasing;
+		
+				bool isPositive;
+		// }
+
 	private:
 		static int numSelected;
 		static int tanksPerTeam;
 		static int totalBBCreated;
-		int team;		//0 is red, 2 is blue
 
-		Ogre::SceneNode* tankNode;
 		Ogre::SceneNode* turretNode;
 		Ogre::SceneNode* barrelNode;
 		RandomPosition* posMgr;
@@ -79,7 +93,6 @@ class MoveableEntity
 		bool selected;
 		Ogre::Vector3 destination;
 		Ogre::SceneNode *nodeToChase;
-		Ogre::Real timeSinceLastCheck;
 
 		Ogre::BillboardSet* mHealthBar;
 		Ogre::Billboard* mHealthBarBB;
@@ -99,15 +112,6 @@ class MoveableEntity
 		std::vector<int> path;
 		int nextNode;
 		int lastNode;
-
-		//states
-		bool isSearchingForTarget;
-		bool isChasingTarget;
-		bool isRotating;
-		bool isMoving;
-		bool isChasing;
-		
-		bool isPositive;
 };
 
 #endif
