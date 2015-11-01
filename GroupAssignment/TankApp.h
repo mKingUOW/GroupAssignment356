@@ -52,6 +52,11 @@ public:
 	static const int HALF_Z_SIZE = 1600;
 	static const int RED = 0;
 	static const int BLUE = 2;
+	
+	void update(const int currTank, Ogre::Real time);
+	void searchForTarget(const int currTank, Ogre::Real time);
+	void chaseTarget(const int currTank, Ogre::Real time);
+	bool checkForEnemy(const int currTank);
  
 protected:
 	virtual bool setup();
