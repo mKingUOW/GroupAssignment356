@@ -53,27 +53,34 @@ void TankApp::update(const int currTank, Ogre::Real time)
 //search happens once per second
 void TankApp::searchForTarget(const int currTank, Ogre::Real time)
 {
+	int enemyTank = -1;
+
 	//move the entity
 	allTanks[currTank].moveEntity(time);
 
 	allTanks[currTank].timeSinceLastCheck += time;
 	if (allTanks[currTank].timeSinceLastCheck > CHECK_INTERVAL)
 	{
-		if (checkForEnemy(currTank))	//this method sets nodeToChase
+		enemyTank = checkForEnemy(currTank);
+		if (enemyTank != -1)	//this method sets nodeToChase
 		{
-			allTanks[currTank].isSearchingForTarget = false;
+			//allTanks[currTank].isSearchingForTarget = false;
+			allTanks[currTank].isSearchingForTarget = true;		// for debugging
 			allTanks[currTank].isChasingTarget = true;
 		}
 		allTanks[currTank].timeSinceLastCheck = 0;
 	}
+
+	if (allTanks[currTank].isChasingTarget)
+		chaseTarget(currTank, enemyTank, time);
 }
 
-void TankApp::chaseTarget(const int currTank, Ogre::Real time)
+void TankApp::chaseTarget(const int currTank, const int enemyTank, Ogre::Real time)
 {
-	
+	allTanks[currTank].chase(allTanks[enemyTank].tankNode);
 }
 
-bool TankApp::checkForEnemy(const int currTank)
+int TankApp::checkForEnemy(const int currTank)
 {
 	// assign a radius to check around the current tank
 	// iterate through nodes checking for enemy
@@ -83,9 +90,9 @@ bool TankApp::checkForEnemy(const int currTank)
 	// else (this case means the enemy is within vision range, but not firing range)
 		// chaseTarget
 
-	int visionRadius = 10, shootRadius = 5;
+	int visionRadius = 5, shootRadius = 3;
 	int xGrid = 0, zGrid = 0;
-	//MoveableEntity *currTankPtr = &allTanks[currTank];																						// x and z iteraters for traversing through grid nodes
+	//MoveableEntity *currTankPtr = &allTanks[currTank];																								// x and z iteraters for traversing through grid nodes
 	int xPos = static_cast<int>(allTanks[currTank].tankNode->convertLocalToWorldPosition(allTanks[currTank].tankNode->getPosition()).x / SQUARE_SIZE);	// x position of current tank in mGrid array
 	int zPos = static_cast<int>(allTanks[currTank].tankNode->convertLocalToWorldPosition(allTanks[currTank].tankNode->getPosition()).z / SQUARE_SIZE);	// z position of current tank in mGrid array
 
@@ -96,11 +103,7 @@ bool TankApp::checkForEnemy(const int currTank)
 	zGrid = zPos - visionRadius;
 	if(zPos - visionRadius <= 0)
 		zGrid = 0;
-/*
-	for(zGrid; zGrid < (zGrid + (1+2*visionRadius)); zGrid++)
-	{
-	}
-*/
+
 	for (int i = 0; i < currentNumTanks; i++)
 	{
 		Ogre::Vector3 otherTankWorldPos = Ogre::Vector3(allTanks[i].tankNode->convertLocalToWorldPosition(allTanks[i].tankNode->getPosition()).x / SQUARE_SIZE, 0, allTanks[i].tankNode->convertLocalToWorldPosition(allTanks[i].tankNode->getPosition()).z / SQUARE_SIZE);	// convert tanks' position to integer
@@ -110,13 +113,12 @@ bool TankApp::checkForEnemy(const int currTank)
 
 		if(allTanks[i].team != allTanks[currTank].team)	// if this and the other tank are on opposing teams
 			if((otherTankXpos >= xPos - visionRadius) && (otherTankXpos <= xPos + visionRadius) && (otherTankZpos >= zPos - visionRadius) && (otherTankZpos <= zPos + visionRadius)) // if the other tank is within vision range
-				{
-					return true;	// return "enemy has been found"
-				}
-
+			{
+				return i;	// return found enemy
+			}
 	}
 
-	return false;
+	return -1;
 }
 
 bool TankApp::setup(void)
