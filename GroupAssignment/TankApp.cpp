@@ -283,7 +283,7 @@ bool TankApp::keyPressed( const OIS::KeyEvent &arg )
 			toggleGrid();
 			break;
 
-		case OIS::KC_M:
+		case OIS::KC_TAB:
 			mTrayMgr->showTrays();
 			break;
 
@@ -304,7 +304,7 @@ bool TankApp::keyReleased(const OIS::KeyEvent &arg)
 			alterSelection = false;
 			break;
 
-		case OIS::KC_M:
+		case OIS::KC_TAB:
 			mTrayMgr->hideTrays();
 			break;
 			
