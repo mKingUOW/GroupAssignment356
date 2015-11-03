@@ -193,6 +193,25 @@ void TankApp::createScene(void)
 	createGrid();
 }
 
+void TankApp::createFrameListener(void)
+{
+	BaseApplication::createFrameListener();
+ 
+	// Populate the camera container
+	cameraNode = mCamera->getParentSceneNode();
+
+	// show the cursor
+	mTrayMgr->showCursor();
+	
+	scoreboardLabel = mTrayMgr->createLabel(OgreBites::TL_TOP, "Scoreboard", "Scoreboard", 200);
+
+	vsLabel = mTrayMgr->createLabel(OgreBites::TL_CENTER, "vs", "vs", 0);
+	blueTeamLabel = mTrayMgr->createLabel(OgreBites::TL_LEFT, "BlueTeamLabel", "Blue Team", 200);
+	blueTeamParams = mTrayMgr->createParamsPanel(OgreBites::TL_LEFT, "BlueTeam", 0.95*mWindow->getWidth()/2, 4);
+	redTeamLabel = mTrayMgr->createLabel(OgreBites::TL_RIGHT, "RedTeamLabel", "Red Team", 200);
+	redTeamParams = mTrayMgr->createParamsPanel(OgreBites::TL_RIGHT, "RedTeam", 0.95*mWindow->getWidth()/2, 4);
+}
+
 bool TankApp::frameRenderingQueued(const Ogre::FrameEvent& evt)
 {
     if(mWindow->isClosed())
@@ -264,6 +283,10 @@ bool TankApp::keyPressed( const OIS::KeyEvent &arg )
 			toggleGrid();
 			break;
 
+		case OIS::KC_M:
+			mTrayMgr->showTrays();
+			break;
+
 		default:
 			break;
 	}
@@ -281,6 +304,10 @@ bool TankApp::keyReleased(const OIS::KeyEvent &arg)
 			alterSelection = false;
 			break;
 
+		case OIS::KC_M:
+			mTrayMgr->hideTrays();
+			break;
+			
 		default:
 			break;
 	}
