@@ -61,6 +61,13 @@ public:
 	int debugInt;
  
 protected:
+	OgreBites::Label* scoreboardLabel;
+	OgreBites::Label* vsLabel;
+	OgreBites::Label* blueTeamLabel;
+	OgreBites::Label* redTeamLabel;
+	OgreBites::ParamsPanel* blueTeamParams;
+	OgreBites::ParamsPanel* redTeamParams;
+	
 	virtual bool setup();
     virtual void createScene(void);
 	virtual void createFrameListener(void);
