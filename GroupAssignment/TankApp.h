@@ -55,8 +55,10 @@ public:
 	
 	void update(const int currTank, Ogre::Real time);
 	void searchForTarget(const int currTank, Ogre::Real time);
-	void chaseTarget(const int currTank, Ogre::Real time);
-	bool checkForEnemy(const int currTank);
+	void chaseTarget(const int currTank, const int enemyTank, Ogre::Real time);
+	int checkForEnemy(const int currTank);
+
+	int debugInt;
  
 protected:
 	virtual bool setup();
@@ -77,7 +79,7 @@ private:
 	void checkClickSelection();
 	Ogre::Plane createPlane(const Ogre::Vector3 &v1, const Ogre::Vector3 &v2, const Ogre::Vector3 &v3);
 	void detachAll();
-	int getIndexFromString(const std::string& name);
+	int getIndexFromString(const std::string& name, bool isClickRaycast);
 
 	//scene creation
 	void addTank(MoveableEntity& tank, int count, int team);

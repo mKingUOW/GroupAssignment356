@@ -226,7 +226,7 @@ bool TankApp::frameRenderingQueued(const Ogre::FrameEvent& evt)
 			mDetailsPanel->setParamValue(2, Ogre::StringConverter::toString(mCamera->getDerivedPosition().z));
 			mDetailsPanel->setParamValue(4, name);
 			mDetailsPanel->setParamValue(5, Ogre::StringConverter::toString(MoveableEntity::getNumSelected()));
-			//mDetailsPanel->setParamValue(6, Ogre::StringConverter::toString();
+			mDetailsPanel->setParamValue(6, Ogre::StringConverter::toString(debugInt));
 			//mDetailsPanel->setParamValue(7, Ogre::StringConverter::toString(robot[0].distTravelled));
 		}
 	}
@@ -603,16 +603,19 @@ void TankApp::checkBoxSelection()
 	detachAll();
 
 	Ogre::SceneQueryResultMovableList::iterator it;
-	//increments the character value of i each iteration so we can use a character to search the entity name
+	debugInt = 0;
 	for (it = result.movables.begin(); it != result.movables.end(); ++it)
 	{
 		Ogre::String name = (*it)->getName();
 
-		int index = getIndexFromString(name);
+		int index = getIndexFromString(name, false);
 		
-		//make sure index is within correct range, more thatn 0 and less than the current number of tanks in the game
+		//make sure index is within correct range, >= 0 and less than the current number of tanks in the game
 		if(index >= 0 && index < currentNumTanks)
+		{
 			allTanks[index].toggleSelection();
+			debugInt++;
+		}
 	}
 	mSceneMgr->destroyQuery(volumeQuery);
 	//need to detach the manual object to avoid inability to select entities underneath it
@@ -645,7 +648,7 @@ void TankApp::checkClickSelection()
 		// Get name of movable object that was hit
 		name = itr->movable->getName();
 		
-		int index = getIndexFromString(name);
+		int index = getIndexFromString(name, true);
 		
 		//make sure index is within correct range, more thatn 0 and less than the current number of tanks in the game
 		if(index >= 0 && index < currentNumTanks)
@@ -692,12 +695,18 @@ void TankApp::detachAll()
 //character digit minus character baseChar will give us the correct index for an entity
 //ASCII value of '0' is 30 therefore, 30 - 30 = 0, ASCII value of '1' is 31 therefore 31 - 30 = 1 etc
 //THIS METHOD SHOULD ONLY BE USED FOR VALUES INCLUDING 0-9 (10 VALUES) 
-int TankApp::getIndexFromString(const std::string& name)
+int TankApp::getIndexFromString(const std::string& name, bool isClickRaycast)
 {
-	char baseChar = '0';
+	char baseChar = '0', digit;
 
-	//get the last character of the entities name
-	char digit = name[name.length()-1];
+	//need to different ways of returning the index based on whether ray was cast using a click
+	//or using volume bounded query
+	if (isClickRaycast)
+		digit = name[name.length() - 1];
+	else if (name[0] == 'b')
+		digit = name[4];
+	else
+		return -1;
 
 	return digit - baseChar;
 }
